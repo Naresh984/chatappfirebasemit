@@ -33,6 +33,9 @@ class _LoginPageState extends State<LoginPage> {
   final emailController =TextEditingController();
   final passController =TextEditingController();
 
+  final AuthService _authService = AuthService();
+
+
   //signin logic
   Future<void> login(BuildContext context) async {
     try {
@@ -40,7 +43,14 @@ class _LoginPageState extends State<LoginPage> {
         email: emailController.text,
         password: passController.text,
       );
-      // after creating the user,create a new document  for the user in the users collection
+
+      // Check if the user is linked with a Google account
+      if (userCredential.user != null && userCredential.user!.providerData.any((userInfo) => userInfo.providerId == 'google.com')) {
+        Get.snackbar('Error', 'This email is associated with a Google account. Please sign in with Google.');
+        return;
+      }
+
+      // after creating the user, create a new document for the user in the users collection
       _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'email': emailController.text,
@@ -56,9 +66,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 
-  //loginwithgoogle
-  final AuthService _authService = AuthService();
 
+  //loginwithgoogle
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
       UserCredential? userCredential = await _authService.signInWithGoogle();
@@ -147,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          AuthService().signInWithGoogle();
+                          _authService.signInWithGoogle();
                         },
                         child: Image.asset(
                           'lib/images/google.png', // Replace with your Google Sign-In button image
