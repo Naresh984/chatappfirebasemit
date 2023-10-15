@@ -30,9 +30,27 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/home', page: () => HomePage()),
         GetPage(name: '/testing', page: () => PostListPage())
       ],
-      // hello Googledsafaf updated
+
       //testing
-      home: LoginPage(),
+      home: StreamBuilder(
+        // Listen to changes in the authentication state using the authStateChanges stream.
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          // Check if the connection to the stream is active.
+          if (snapshot.connectionState == ConnectionState.active) {
+            // Get the user object from the stream data. It could be null if the user is not authenticated.
+            User? user = snapshot.data as User?;
+            // If the user is null, redirect to the LoginPage. Otherwise, redirect to the HomePage.
+            return user == null ? LoginPage() : HomePage(); // Redirect based on authentication state
+          } else {
+            // If the connection to the stream is not yet active, show a loading indicator.
+            return Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+        },
+      ),
+
     );
   }
 }
