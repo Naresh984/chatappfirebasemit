@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/home', page: () => HomePage()),
         GetPage(name: '/testing', page: () => PostListPage())
       ],
-      // hello Googledsafaf
+      // hello Googledsafaf updated
       //testing
       home: LoginPage(),
     );
