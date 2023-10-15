@@ -29,26 +29,40 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> registerWithEmailAndPassword(BuildContext context) async {
     try {
       if (passController.text == confirmController.text) {
-        UserCredential userCredential=
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passController.text,
         );
-        // after creating the user,create a new document  for the user in the users collection
-        // if it doesn't already exists
-        _firestore.collection('users').doc(userCredential.user!.uid).set({
+
+        // Create a new document for the user in the 'users' collection
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
           'uid': userCredential.user!.uid,
-          'emial': emailController.text
-        },SetOptions(merge: true));
-        Get.off(LoginPage());
-      } else if(passController.text != confirmController.text) {
-        Get.snackbar('','Password do not match...');
+          'email': emailController.text, // Fixed typo in 'email'
+        }, SetOptions(merge: true));
+
+        // Show a Snackbar indicating successful signup
+        Get.snackbar('Success', 'Signup successful');
+
+        // Redirect to LoginPage
+        Get.to(LoginPage());
+      } else {
+        Get.snackbar('', 'Passwords do not match...');
       }
     } catch (error) {
       print('Error registering user: $error');
       // Display an error message to the user.
+
+      // Check if the error message indicates that the user is already registered
+      if (error.toString().contains('email-already-in-use')) {
+        // Show a Snackbar indicating that the user is already registered
+        Get.snackbar('Invalid', 'User is already registered. Click below to login Now.');
+      } else {
+        // Show a generic error Snackbar
+        Get.snackbar('Error', 'Registration failed. Please try again later.');
+      }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

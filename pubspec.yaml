@@ -71,7 +71,10 @@ flutter:
   assets:
     - lib/chatbg1.png
     - lib/images/google.png
-    - lib/images/user.png
+    - lib/images/businessman.png
+    - lib/images/man.png
+    - lib/images/woman.png
+    -
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -25,6 +27,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> _signOut(BuildContext context) async {
     try {
       await _auth.signOut();
+      // Clear the latestMessages map when signing out
+      latestMessages.clear();
       Get.snackbar('Success', 'Sign out successful');
       Get.offAll(() => LoginPage());
     } catch (error) {
@@ -84,6 +88,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildUserList() {
+    Random random = Random();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: FutureBuilder(
@@ -100,36 +106,44 @@ class _HomePageState extends State<HomePage> {
           List<Widget> userItems = [];
           snapshot.data!.forEach((userData) {
             String email = userData['email'] ?? '';
-            String displayName = email
-                .split('@')
-                .first;
+            String displayName = email.split('@').first;
+
+            String profileImage;
+            int randomImageIndex = random.nextInt(3);
+
+            if (randomImageIndex == 0) {
+              profileImage = 'lib/images/man.png';
+            } else if (randomImageIndex == 1) {
+              profileImage = 'lib/images/woman.png';
+            } else {
+              profileImage = 'lib/images/businessman.png'; // Add your third image path here
+            }
+
 
             userItems.add(
               GestureDetector(
                 onTap: () {
-                  //navigating to user's chat page and also giving receiver email and uid
+                  // Navigating to user's chat page and also giving receiver email and uid
                   Get.to(ChatPage(
                     receiveruserEmail: userData['email'],
                     receiverUserID: userData['uid'],
                   ));
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 8.0, horizontal: 0),
+                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
                   child: ListTile(
                     dense: true,
                     leading: CircleAvatar(
-                      radius: 20, // Adjust the radius according to your design
+                      radius: 20,
                       backgroundColor: Colors.deepPurpleAccent[300],
-                      child: Image.asset('lib/images/user.png'),
-                       // Replace with the URL to the user's profile image
+                      child: Image.asset(profileImage), // Use randomly selected profile image
                     ),
-                    title: Text(displayName,
-                        style: TextStyle(fontSize: 15, color: Color(0xFF21215E)
-                            .withOpacity(0.7))),
+                    title: Text(
+                      displayName,
+                      style: TextStyle(fontSize: 15, color: Color(0xFF21215E).withOpacity(0.7)),
+                    ),
                     subtitle: Text(latestMessages[userData['uid']] ?? ''),
                     tileColor: Colors.white,
-                    // Set tile background color
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -149,11 +163,14 @@ class _HomePageState extends State<HomePage> {
   }
 
 
+
   Future<List<Map<String, dynamic>>> _fetchUserList() async {
     List<Map<String, dynamic>> userList = [];
 
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection(
         'users').get();
+
+    Map<String, String> userNames = {};
 
     for (var doc in snapshot.docs) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
