@@ -33,15 +33,17 @@ class _HomePageState extends State<HomePage> {
   }
 
 
-
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Color(0xFF21215E).withOpacity(0.5), // Set the status bar color
-      statusBarIconBrightness: Brightness.light, // Set the status bar icons color
-      systemNavigationBarColor: Color(0xFF21215E).withOpacity(0.7), // Set the navigation bar color
-      systemNavigationBarDividerColor: Colors.transparent, // Set the navigation bar divider color
+      statusBarColor: Color(0xFF21215E).withOpacity(0.5),
+      // Set the status bar color
+      statusBarIconBrightness: Brightness.light,
+      // Set the status bar icons color
+      systemNavigationBarColor: Color(0xFF21215E).withOpacity(0.7),
+      // Set the navigation bar color
+      systemNavigationBarDividerColor: Colors
+          .transparent, // Set the navigation bar divider color
     ));
     return WillPopScope(
       onWillPop: () async {
@@ -59,7 +61,9 @@ class _HomePageState extends State<HomePage> {
                 child: Text(
                   'Message',
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
                 ),
               ),
             ),
@@ -67,7 +71,7 @@ class _HomePageState extends State<HomePage> {
             actions: [
               IconButton(
                 icon: Icon(Icons.logout),
-                onPressed: (){
+                onPressed: () {
                   _signOut(context);
                 },
               ),
@@ -96,29 +100,40 @@ class _HomePageState extends State<HomePage> {
           List<Widget> userItems = [];
           snapshot.data!.forEach((userData) {
             String email = userData['email'] ?? '';
-            String displayName = email.split('@').first;
+            String displayName = email
+                .split('@')
+                .first;
 
             userItems.add(
               GestureDetector(
                 onTap: () {
-                  //navigating to user's chat page and also giving reciveremail and uid
+                  //navigating to user's chat page and also giving receiver email and uid
                   Get.to(ChatPage(
                     receiveruserEmail: userData['email'],
                     receiverUserID: userData['uid'],
                   ));
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-                  child: Card(
-                    elevation: 2, // Add elevation for 3D effect
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 0),
+                  child: ListTile(
+                    dense: true,
+                    leading: CircleAvatar(
+                      radius: 20, // Adjust the radius according to your design
+                      backgroundColor: Colors.deepPurpleAccent[300],
+                      child: Image.asset('lib/images/user.png'),
+                       // Replace with the URL to the user's profile image
+                    ),
+                    title: Text(displayName,
+                        style: TextStyle(fontSize: 15, color: Color(0xFF21215E)
+                            .withOpacity(0.7))),
+                    subtitle: Text(latestMessages[userData['uid']] ?? ''),
+                    tileColor: Colors.white,
+                    // Set tile background color
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-                    child: ListTile(
-                      dense: true,
-                      title: Text(displayName,style: TextStyle(fontSize: 15,color: Color(0xFF21215E).withOpacity(0.7)),),
-                      subtitle: Text(latestMessages[userData['uid']] ?? ''),
-                    ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                   ),
                 ),
               ),
@@ -132,7 +147,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
 
   Future<List<Map<String, dynamic>>> _fetchUserList() async {
@@ -157,8 +171,16 @@ class _HomePageState extends State<HomePage> {
           latestMessage = latestSnapshot.docs.last['message'];
         }
 
+        String profilePictureUrl = data['profilePictureUrl'] ??
+            ''; // Retrieve profile picture URL from Firestore data
+
         latestMessages[data['uid']] = latestMessage;
-        userList.add(data);
+        userList.add({
+          'uid': data['uid'],
+          'email': data['email'],
+          'profilePictureUrl': profilePictureUrl,
+          // Add the profile picture URL to the user list
+        });
       }
     }
 

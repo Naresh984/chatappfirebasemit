@@ -33,5 +33,7 @@ class AuthService{
     Get.offAll(() => HomePage());
 
 
+    //should solve the issue
   }
 }
+
