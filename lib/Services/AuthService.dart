@@ -32,6 +32,6 @@ class AuthService{
     await FirebaseAuth.instance.signInWithCredential(credential);
     Get.offAll(() => HomePage());
 
-
+    //should solve the issue
   }
 }
