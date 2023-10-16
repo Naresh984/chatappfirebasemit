@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../Services/chatcontroller.dart';
-
+//this is a chat page
 class ChatPage extends StatefulWidget {
   final String receiveruserEmail;
   final String receiverUserID;
